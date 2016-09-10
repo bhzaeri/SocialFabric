@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.bahram.socialfabric</groupId>
+	<artifactId>socialfabric</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>SocialFabric</name>
+	<dependencies>
+		<dependency>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_2.11</artifactId>
+			<version>3.0.0-M15</version>
+		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>org.scala-lang</groupId>-->
+			<!--<artifactId>scala-library</artifactId>-->
+			<!--<version>2.12.0-M5</version>-->
+		<!--</dependency>-->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source />
+					<target />
+				</configuration>
+				<version>3.3</version>
+			</plugin>
+		</plugins>
+	</build>
+</project>
