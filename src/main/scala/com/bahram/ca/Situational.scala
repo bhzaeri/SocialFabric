@@ -2,6 +2,7 @@ package com.bahram.ca
 
 import com.bahram.socialfabric.Individual
 import com.bahram.util.RandomUtil
+import main.scala.com.bahram.ca.TribalRunner
 
 /**
   * Created by zaeri on 02/08/16.
@@ -33,6 +34,7 @@ class Situational extends KnowledgeSource {
 
       }
       t.fitnessValue = fitness(t.vector)
+      TribalRunner.checkCount()
       t.ksType = KSEnum.SITUATIONAL
     }
 

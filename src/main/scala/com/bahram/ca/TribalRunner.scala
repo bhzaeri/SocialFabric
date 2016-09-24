@@ -5,10 +5,10 @@ import java.io.PrintWriter
 import cec2015.FitnessFactory
 import com.bahram.ca._
 import com.bahram.ep.{EpRunner, EvolutionaryProgramming}
-import com.bahram.pso.PSOFactory
+import com.bahram.pso.{PSOAlgorithm, PSOFactory, PsoRunner}
 import com.bahram.socialfabric.topology.TopologyFactory
 import com.bahram.socialfabric.{Individual, Neighborhood}
-import com.bahram.util.MyLogger
+import com.bahram.util.{MyLogger, PhaseChange}
 import main.java.com.bahram.ca.{NormativeUpdate, TopographicUpdate}
 import main.scala.com.bahram.socialfabric.TieBreakingRules
 import org.apache.log4j.Logger
@@ -26,18 +26,22 @@ object TribalRunner {
   var bestSoFar: Individual = _
 
   def main(args: Array[String]): Unit = {
-    run()
+    for (i <- 1 to 15) {
+      run(i)
+      Config.filePrinter.write("\n");
+    }
+    MyLogger.close()
   }
 
-  def run(): Unit = {
-    configure()
+  def run(funcIndex: Int): Unit = {
+    configure(funcIndex)
     tribes = Array.fill[Neighborhood](10) {
       new Neighborhood(PSOFactory.population(Config.makePopulation(popSize), Config.extra, Config.fitness),
         TopologyFactory.create(0, popSize), new CAModule)
     }
     while (Config.countFEs <= Config.maxFEs) {
       tribes.foreach(tribe => {
-        Config.calculateNewPopulation(tribe, Config.fitness)
+        Config.calculateNewPopulation(Config.iter, tribe, Config.fitness)
       })
 
       tribes.foreach(tribe => {
@@ -75,20 +79,8 @@ object TribalRunner {
       tribes.foreach(tribe => {
         if (Config.applyCA != null) {
           Config.applyCA(Config.iter, tribe, Config.fitness)
-
-          val ks = tribe.individuals_(0).ksType
-          var flag = true
-          for (i <- 1 until tribe.individuals_.length) {
-            if (tribe.individuals_(i).ksType != ks)
-              flag = false
-          }
-          if (flag) {
-            val gggg = 0
-          }
         }
       })
-
-
 
       if (Config.thirdPhase && tribes.length > 1) {
         tribes = Array.fill[Neighborhood](1) {
@@ -97,32 +89,42 @@ object TribalRunner {
         logger.info("unifiedDDDDDDDDDDDDDDDDDDDD")
       }
 
-      logger.info(Config.iter)
+      logger.info(Config.iter + "   " + Config.countFEs)
     }
-    MyLogger.close()
   }
 
-  def configure() = {
+  def configure(funcIndex: Int) = {
 
-    Config.filePrinter = new PrintWriter("sfep.txt")
-    Config.makePopulation = EpRunner.make
-    Config.extra = EpRunner.extra
-    Config.calculateNewPopulation = EvolutionaryProgramming.calculateNewPopulation
-    Config.applyNewPosition = EvolutionaryProgramming.applyNewPositions
-
-    //        Config.filePrinter = new PrintWriter("sfpso.txt")
-    //        Config.makePopulation = PsoRunner.make
-    //        Config.extra = PsoRunner.extra
-    //        Config.calculateNewPopulation = PSOAlgorithm.calculateNewPopulation
-    //        Config.applyNewPosition = PSOAlgorithm.applyNewPosition
+        if (Config.filePrinter == null)
+          Config.filePrinter = new PrintWriter("src/main/resources/results/sfep.txt")
+        Config.makePopulation = EpRunner.make
+        Config.extra = EpRunner.extra
+        Config.calculateNewPopulation = EvolutionaryProgramming.calculateNewPopulation
+        Config.applyNewPosition = EvolutionaryProgramming.applyNewPositions
+        Config.wSize = 1
+        Config.applyCA = null
+//
+//    if (Config.filePrinter == null)
+//      Config.filePrinter = new PrintWriter("src/main/resources/results/sfpso.txt")
+//    Config.makePopulation = PsoRunner.make
+//    Config.extra = PsoRunner.extra
+//    Config.calculateNewPopulation = PSOAlgorithm.calculateNewPopulation
+//    Config.applyNewPosition = PSOAlgorithm.applyNewPosition
+//    Config.wSize = 3
+//    Config.applyCA = PSOFactory.applySocialFabric
 
     Config.normativeUpdate = NormativeUpdate.update2
     Config.topographicUpdate = TopographicUpdate.update2
     Config.psoStrategy = PSOFactory.pso1
     //    Config.evolutionStep = PSOAlgorithm.evolutionStep
-    Config.fitness = FitnessFactory.factory(1)
-    Config.applyCA = PSOFactory.applySocialFabric
+    Config.fitness = FitnessFactory.factory(funcIndex)
     Config.tieBreakingRule = TieBreakingRules.mfu
+    Config.iter = 0
+    Config.countFEs = 0
+    Config.printCount = 1
+    Config.secondPhase = false
+    Config.thirdPhase = false
+    bestSoFar = null
   }
 
   def neighborhoodRestructure(tribe: Neighborhood): Unit = {
@@ -179,6 +181,12 @@ object TribalRunner {
       all ++= tribe.getIndividuals
     })
     new Neighborhood(all.toArray, TopologyFactory.create(0, all.size), new CAModule)
+  }
+
+  def checkCount() = {
+    Config.countFEs += 1
+    MyLogger.checkPrint()
+    PhaseChange.checkChange()
   }
 
 }

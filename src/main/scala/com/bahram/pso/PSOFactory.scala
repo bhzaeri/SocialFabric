@@ -21,11 +21,11 @@ object PSOFactory {
     for (d <- 0 until dimSize) {
       val r1 = RandomUtil.nextDouble()
       val r2 = RandomUtil.nextDouble()
-      self.velocity(d) =  0.6 * self.velocity(d) + r1 * c1 * (self.bestVector(d) - self.vector(d)) + r2 * c2 * (best.vector(d) - self.vector(d))
+      self.velocity(d) = 0.6 * self.velocity(d) + r1 * c1 * (self.bestVector(d) - self.vector(d)) + r2 * c2 * (best.vector(d) - self.vector(d))
     }
   }
 
-  def applySocialFabric(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double] => Double)): Unit = {
+  def applySocialFabric(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double] => Double)): Boolean = {
     if (iteration % Config.wSize == 0) {
       if (Config.secondPhase || Config.thirdPhase) {
         val individuals = neighborhood.getIndividuals
@@ -82,14 +82,19 @@ object PSOFactory {
         })
       }
       applyNormalCA(iteration, neighborhood, fitness)
+      return true
     }
+    false
   }
 
-  def applyNormalCA(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double] => Double)): Unit = {
+  def applyNormalCA(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double] => Double)): Boolean = {
     if (iteration % Config.wSize == 0) {
       val newPop = neighborhood.cAModule.update(neighborhood, fitness)
       neighborhood.setIndividuals(newPop)
+//      assert(neighborhood.getIndividuals.length % 2 == 0)
+      return true
     }
+    false
   }
 
 

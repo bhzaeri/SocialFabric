@@ -1,8 +1,9 @@
 package com.bahram.ep
 
 import com.bahram.ca._
+import com.bahram.pso.PSOFactory
 import com.bahram.socialfabric.{Individual, Neighborhood}
-import com.bahram.util.{MyLogger, PhaseChange, RandomUtil}
+import com.bahram.util.{MyLogger, RandomUtil}
 
 import scala.util.Random
 
@@ -21,14 +22,16 @@ object EvolutionaryProgramming {
   }
 
   def search(neighborhood: Neighborhood, fitness: Array[Double] => Double): Unit = {
+    var iteration = 1
     while (Config.countFEs <= Config.maxFEs) {
-      evolutionStep(neighborhood, fitness)
+      evolutionStep(iteration, neighborhood, fitness)
+      iteration += 1
     }
     MyLogger.close()
   }
 
-  def evolutionStep(neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
-    calculateNewPopulation(neighborhood, fitness)
+  def evolutionStep(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
+    calculateNewPopulation(iteration, neighborhood, fitness)
     applyNewPositions(neighborhood, fitness)
   }
 
@@ -51,18 +54,18 @@ object EvolutionaryProgramming {
     }
   }
 
-  def calculateNewPopulation(neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
+  def calculateNewPopulation(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
     val popSize = neighborhood.getIndividuals.length
-    var children = neighborhood.cAModule.update2(neighborhood, fitness) //new Array[EpIndividual](popSize)
-    for (i <- 0 until popSize) {
-//      children(i) = mutate(neighborhood.getIndividuals(i)).asInstanceOf[EpIndividual]
-      children(i).fitnessValue = fitness(children(i).vector)
-      Config.countFEs += 1
-      MyLogger.checkPrint()
-      PhaseChange.checkChange()
-    }
-    children = children.sortWith((a: Individual, b: Individual) => a.fitnessValue < b.fitnessValue)
-    neighborhood.setIndividuals(children.++(neighborhood.getIndividuals))
+    PSOFactory.applySocialFabric(iteration, neighborhood, fitness) //neighborhood.cAModule.update2(neighborhood, fitness) //new Array[EpIndividual](popSize)
+    //    for (i <- 0 until popSize) {
+    //      //      children(i) = mutate(neighborhood.getIndividuals(i)).asInstanceOf[EpIndividual]
+    //      children(i).fitnessValue = fitness(children(i).vector)
+    //      Config.countFEs += 1
+    //      MyLogger.checkPrint()
+    //      PhaseChange.checkChange()
+    //    }
+    //    children = children.sortWith((a: Individual, b: Individual) => a.fitnessValue < b.fitnessValue)
+    //    neighborhood.setIndividuals(children.++(neighborhood.getIndividuals))
   }
 
   def mutate(c: Individual): Individual = {

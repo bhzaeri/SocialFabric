@@ -10,19 +10,18 @@ object MyLogger {
 
   val topographicLogger = Logger.getLogger(classOf[Topographic])
 
-  var printCount = 1
   var flag = false
 
   def checkPrint(): Unit = {
-    if (Config.countFEs == (Config.maxFEs * printCount * 0.01).asInstanceOf[Int]) {
+    if (Config.countFEs == (Config.maxFEs * Config.printCount * 0.01).asInstanceOf[Int]) {
       flag = true
     }
   }
 
   def logInfo(value: Double): Unit = {
     if (flag) {
-      Config.filePrinter.write(printCount.toString + " ::: " + value.toString + "\n")
-      printCount += 1
+      Config.filePrinter.write(value.toString + " ")
+      Config.printCount += 1
       flag = false
     }
   }

@@ -17,10 +17,10 @@ class CAModule {
     val offSprings = update2(neighborhood, fitness)
 
     val length = population.length
-    val population2: Array[Individual] = population ++ offSprings
+    val population2 = population ++ offSprings
     scala.util.Sorting.stableSort[Individual](population2, Config.compareAsc _)
-    population2.slice(0, length)
-
+//    population2.slice(0, length)
+    population2
   }
 
   def update2(neighborhood: Neighborhood, fitness: (Array[Double] => Double)): Array[Individual] = {

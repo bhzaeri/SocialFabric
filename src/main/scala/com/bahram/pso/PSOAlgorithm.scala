@@ -2,7 +2,7 @@ package com.bahram.pso
 
 import com.bahram.ca._
 import com.bahram.socialfabric.Neighborhood
-import com.bahram.util.{MyLogger, PhaseChange}
+import com.bahram.util.MyLogger
 import main.scala.com.bahram.ca.TribalRunner
 import org.apache.log4j.Logger
 
@@ -15,15 +15,17 @@ object PSOAlgorithm {
   }
 
   def solve(neighborhood: Neighborhood, fitness: (Array[Double] => Double)) = {
+    var iteration = 1
     while (Config.countFEs <= Config.maxFEs) {
-      evolutionStep(neighborhood, fitness)
+      evolutionStep(iteration, neighborhood, fitness)
+      iteration += 1
     }
     MyLogger.close()
     logger.info("Best fitness is :: " + neighborhood.findBestIndividual().fitnessValue)
   }
 
-  def evolutionStep(neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
-    calculateNewPopulation(neighborhood, fitness)
+  def evolutionStep(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
+    calculateNewPopulation(iteration, neighborhood, fitness)
     applyNewPosition(neighborhood, fitness)
     MyLogger.logInfo(neighborhood.findBestIndividual().fitnessValue)
     logger.debug("iteration ::: " + Config.iter)
@@ -34,9 +36,7 @@ object PSOAlgorithm {
       val particle = individual.asInstanceOf[Particle]
       moveParticles(particle)
       particle.fitnessValue = fitness(particle.vector)
-      Config.countFEs += 1
-      MyLogger.checkPrint()
-      PhaseChange.checkChange()
+      TribalRunner.checkCount()
       if (particle.bestFitness > particle.fitnessValue) {
         particle.bestFitness = particle.fitnessValue
         particle.bestVector_(particle.vector)
@@ -61,7 +61,7 @@ object PSOAlgorithm {
     }
   }
 
-  def calculateNewPopulation(neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
+  def calculateNewPopulation(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
     val individuals = neighborhood.getIndividuals
     for (index <- individuals.indices) {
       val particle = individuals(index).asInstanceOf[Particle]
