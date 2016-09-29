@@ -63,9 +63,6 @@ object PSOFactory {
               })
             }
 
-            if (map.size == 1) {
-              var ggg = 0
-            }
             val sorted = map.toSeq.sortWith((a, b) => a._2 > b._2)
             if (sorted.length == 1 && neighborhood.topology.isInstanceOf[GlobalTopology]) {
               individuals(i).nextKsType = TieBreakingRules.random(neighborhood, individuals(i))

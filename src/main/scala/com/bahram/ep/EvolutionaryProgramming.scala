@@ -1,7 +1,6 @@
 package com.bahram.ep
 
 import com.bahram.ca._
-import com.bahram.pso.PSOFactory
 import com.bahram.socialfabric.{Individual, Neighborhood}
 import com.bahram.util.{MyLogger, RandomUtil}
 
@@ -56,7 +55,8 @@ object EvolutionaryProgramming {
 
   def calculateNewPopulation(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
     val popSize = neighborhood.getIndividuals.length
-    PSOFactory.applySocialFabric(iteration, neighborhood, fitness) //neighborhood.cAModule.update2(neighborhood, fitness) //new Array[EpIndividual](popSize)
+    //neighborhood.cAModule.update2(neighborhood, fitness) //new Array[EpIndividual](popSize)
+    Config.epGenerateStrategy(iteration, neighborhood, fitness)
     //    for (i <- 0 until popSize) {
     //      //      children(i) = mutate(neighborhood.getIndividuals(i)).asInstanceOf[EpIndividual]
     //      children(i).fitnessValue = fitness(children(i).vector)

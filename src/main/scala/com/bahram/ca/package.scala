@@ -40,6 +40,7 @@ package object ca {
     var calculateNewPopulation: (Int, Neighborhood, (Array[Double]) => Double) => Unit = _
     var applyNewPosition: (Neighborhood, (Array[Double]) => Double) => Unit = _
     var applyCA: (Int, Neighborhood, (Array[Double] => Double)) => Boolean = _
+    var epGenerateStrategy: (Int, Neighborhood, (Array[Double] => Double)) => Boolean = _
 
     def compareAsc(i1: Individual, i2: Individual): Boolean = i1.fitnessValue < i2.fitnessValue
   }

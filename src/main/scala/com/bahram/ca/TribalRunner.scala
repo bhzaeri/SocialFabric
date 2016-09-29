@@ -4,7 +4,6 @@ import java.io.PrintWriter
 
 import cec2015.FitnessFactory
 import com.bahram.ca._
-import com.bahram.ep.{EpRunner, EvolutionaryProgramming}
 import com.bahram.pso.{PSOAlgorithm, PSOFactory, PsoRunner}
 import com.bahram.socialfabric.topology.TopologyFactory
 import com.bahram.socialfabric.{Individual, Neighborhood}
@@ -28,7 +27,7 @@ object TribalRunner {
   def main(args: Array[String]): Unit = {
     for (i <- 1 to 15) {
       run(i)
-      Config.filePrinter.write("\n");
+      Config.filePrinter.write("\n")
     }
     MyLogger.close()
   }
@@ -95,28 +94,28 @@ object TribalRunner {
 
   def configure(funcIndex: Int) = {
 
-        if (Config.filePrinter == null)
-          Config.filePrinter = new PrintWriter("src/main/resources/results/sfep.txt")
-        Config.makePopulation = EpRunner.make
-        Config.extra = EpRunner.extra
-        Config.calculateNewPopulation = EvolutionaryProgramming.calculateNewPopulation
-        Config.applyNewPosition = EvolutionaryProgramming.applyNewPositions
-        Config.wSize = 1
-        Config.applyCA = null
-//
-//    if (Config.filePrinter == null)
-//      Config.filePrinter = new PrintWriter("src/main/resources/results/sfpso.txt")
-//    Config.makePopulation = PsoRunner.make
-//    Config.extra = PsoRunner.extra
-//    Config.calculateNewPopulation = PSOAlgorithm.calculateNewPopulation
-//    Config.applyNewPosition = PSOAlgorithm.applyNewPosition
-//    Config.wSize = 3
-//    Config.applyCA = PSOFactory.applySocialFabric
+    //    if (Config.filePrinter == null)
+    //      Config.filePrinter = new PrintWriter("src/main/resources/results/caep.txt")
+    //    Config.makePopulation = EpRunner.make
+    //    Config.extra = EpRunner.extra
+    //    Config.calculateNewPopulation = EvolutionaryProgramming.calculateNewPopulation
+    //    Config.applyNewPosition = EvolutionaryProgramming.applyNewPositions
+    //    Config.epGenerateStrategy = PSOFactory.applyNormalCA
+    //    Config.wSize = 1
+    //    Config.applyCA = null
+
+    if (Config.filePrinter == null)
+      Config.filePrinter = new PrintWriter("src/main/resources/results/pso.txt")
+    Config.makePopulation = PsoRunner.make
+    Config.extra = PsoRunner.extra
+    Config.calculateNewPopulation = PSOAlgorithm.calculateNewPopulation
+    Config.applyNewPosition = PSOAlgorithm.applyNewPosition
+    Config.wSize = 3
+    //        Config.applyCA = PSOFactory.applySocialFabric
 
     Config.normativeUpdate = NormativeUpdate.update2
     Config.topographicUpdate = TopographicUpdate.update2
     Config.psoStrategy = PSOFactory.pso1
-    //    Config.evolutionStep = PSOAlgorithm.evolutionStep
     Config.fitness = FitnessFactory.factory(funcIndex)
     Config.tieBreakingRule = TieBreakingRules.mfu
     Config.iter = 0
@@ -150,18 +149,6 @@ object TribalRunner {
     }
   }
 
-  def logBestSoFar(): Unit = {
-    val t = findIntraTribalBest()
-    bestSoFar = if (bestSoFar == null) {
-      t.copy()
-    } else bestSoFar
-    if (t.fitnessValue < bestSoFar.fitnessValue) {
-      bestSoFar.fitnessValue = t.fitnessValue
-      bestSoFar.vector_(t.vector)
-    }
-    MyLogger.logInfo(bestSoFar.fitnessValue)
-  }
-
   def findIntraTribalBest(): Individual = {
     var minValue = Double.MaxValue
     var best: Individual = null
@@ -173,6 +160,18 @@ object TribalRunner {
       }
     })
     best
+  }
+
+  def logBestSoFar(): Unit = {
+    val t = findIntraTribalBest()
+    bestSoFar = if (bestSoFar == null) {
+      t.copy()
+    } else bestSoFar
+    if (t.fitnessValue < bestSoFar.fitnessValue) {
+      bestSoFar.fitnessValue = t.fitnessValue
+      bestSoFar.vector_(t.vector)
+    }
+    MyLogger.logInfo(bestSoFar.fitnessValue)
   }
 
   def unify(): Neighborhood = {
