@@ -1,15 +1,10 @@
 package main.scala.com.bahram.ca
 
-import java.io.PrintWriter
-
-import cec2015.FitnessFactory
 import com.bahram.ca._
-import com.bahram.pso.{PSOAlgorithm, PSOFactory, PsoRunner}
+import com.bahram.pso.PSOFactory
 import com.bahram.socialfabric.topology.TopologyFactory
 import com.bahram.socialfabric.{Individual, Neighborhood}
-import com.bahram.util.{MyLogger, PhaseChange}
-import main.java.com.bahram.ca.{NormativeUpdate, TopographicUpdate}
-import main.scala.com.bahram.socialfabric.TieBreakingRules
+import com.bahram.util.{MyLogger, PhaseChange, RandomUtil}
 import org.apache.log4j.Logger
 
 import scala.collection.mutable.ArrayBuffer
@@ -19,7 +14,6 @@ import scala.collection.mutable.ArrayBuffer
   */
 object TribalRunner {
 
-  val popSize = 9
   var logger = Logger.getLogger(TribalRunner.getClass)
   var tribes: Array[Neighborhood] = _
   var bestSoFar: Individual = _
@@ -34,10 +28,11 @@ object TribalRunner {
 
   def run(funcIndex: Int): Unit = {
     configure(funcIndex)
-    tribes = Array.fill[Neighborhood](10) {
-      new Neighborhood(PSOFactory.population(Config.makePopulation(popSize), Config.extra, Config.fitness),
-        TopologyFactory.create(0, popSize), new CAModule)
+    tribes = Array.fill[Neighborhood](Config.tribeNumber) {
+      new Neighborhood(PSOFactory.population(Config.makePopulation(Config.populationSize), Config.extra, Config.fitness),
+        TopologyFactory.create(Config.topologyType, Config.populationSize), new CAModule)
     }
+
     while (Config.countFEs <= Config.maxFEs) {
       tribes.foreach(tribe => {
         Config.calculateNewPopulation(Config.iter, tribe, Config.fitness)
@@ -53,27 +48,10 @@ object TribalRunner {
       })
 
       logBestSoFar()
+      //Macroscopic neighborhood restructuring
       //checking the conditions for stagnation
-      if (Config.secondPhase || Config.thirdPhase) {
-        tribes.foreach(tribe => {
-          var flag = false
-          tribe.getIndividuals.foreach(i => {
-            if (i.fitnessValue < tribe.bestSoFarValue) {
-              tribe.bestSoFarValue = i.fitnessValue
-              tribe.nsk = 0
-              flag = true
-            }
-          })
-          if (!flag)
-            tribe.nsk += 1
-        })
-      }
-
-      if (Config.secondPhase || Config.thirdPhase) {
-        tribes.foreach(tribe => {
-          neighborhoodRestructure(tribe)
-        })
-      }
+      if (Config.neighborhoodRestructuring != null)
+        Config.neighborhoodRestructuring()
 
       tribes.foreach(tribe => {
         if (Config.applyCA != null) {
@@ -93,37 +71,94 @@ object TribalRunner {
   }
 
   def configure(funcIndex: Int) = {
+    Configure.sfpso(funcIndex)
+  }
 
-    //    if (Config.filePrinter == null)
-    //      Config.filePrinter = new PrintWriter("src/main/resources/results/caep.txt")
-    //    Config.makePopulation = EpRunner.make
-    //    Config.extra = EpRunner.extra
-    //    Config.calculateNewPopulation = EvolutionaryProgramming.calculateNewPopulation
-    //    Config.applyNewPosition = EvolutionaryProgramming.applyNewPositions
-    //    Config.epGenerateStrategy = PSOFactory.applyNormalCA
-    //    Config.wSize = 1
-    //    Config.applyCA = null
+  def logBestSoFar(): Unit = {
+    val t = findIntraTribalBest()
+    bestSoFar = if (bestSoFar == null) {
+      t.copy()
+    } else bestSoFar
+    if (t.fitnessValue < bestSoFar.fitnessValue) {
+      bestSoFar.fitnessValue = t.fitnessValue
+      bestSoFar.vector_(t.vector)
+    }
+    MyLogger.logInfo(bestSoFar.fitnessValue)
+  }
 
-    if (Config.filePrinter == null)
-      Config.filePrinter = new PrintWriter("src/main/resources/results/pso.txt")
-    Config.makePopulation = PsoRunner.make
-    Config.extra = PsoRunner.extra
-    Config.calculateNewPopulation = PSOAlgorithm.calculateNewPopulation
-    Config.applyNewPosition = PSOAlgorithm.applyNewPosition
-    Config.wSize = 3
-    //        Config.applyCA = PSOFactory.applySocialFabric
+  def unify(): Neighborhood = {
+    var all = new ArrayBuffer[Individual]()
+    Config.populationSize *= Config.tribeNumber
+    tribes.foreach(tribe => {
+      all ++= tribe.getIndividuals
+    })
 
-    Config.normativeUpdate = NormativeUpdate.update2
-    Config.topographicUpdate = TopographicUpdate.update2
-    Config.psoStrategy = PSOFactory.pso1
-    Config.fitness = FitnessFactory.factory(funcIndex)
-    Config.tieBreakingRule = TieBreakingRules.mfu
-    Config.iter = 0
-    Config.countFEs = 0
-    Config.printCount = 1
-    Config.secondPhase = false
-    Config.thirdPhase = false
-    bestSoFar = null
+    Config.resetNeighborhood(all)
+
+    new Neighborhood(all.toArray, TopologyFactory.create(0, all.size), new CAModule)
+  }
+
+  def resetNeighborhood(all: ArrayBuffer[Individual]): Unit = {
+    all.foreach(i => {
+      i.resetNeighborhood(Config.populationSize)
+    })
+  }
+
+  def neighborhoodRestructuring2(): Unit = {
+    if (Config.secondPhase || Config.thirdPhase)
+    {
+      tribes.foreach(tribe => {
+        neighborhoodRestructuring2(tribe)
+      })
+    }
+  }
+
+  def neighborhoodRestructuring2(tribe: Neighborhood): Unit = {
+    for (index <- tribe.individuals_.indices) {
+      val i = tribe.individuals_(index)
+      if (i.nsk == Config.mThresh) {
+        val best = tribe.getBestOfNeighborhood2(index)
+        if (i.fitnessValue > best.fitnessValue) {
+          //upgrade
+          if (i.otherNeighbors.nonEmpty) {
+            val ii = RandomUtil.nextInt(i.otherNeighbors.length)
+            val temp = i.otherNeighbors(ii)
+            i.neighbors += temp
+            i.otherNeighbors.remove(ii)
+          }
+        }
+        else if (i.neighbors.length > 1) {
+          //downgrade
+          val ii = RandomUtil.nextInt(i.neighbors.length)
+          val temp = i.neighbors(ii)
+          i.otherNeighbors += temp
+          i.neighbors.remove(ii)
+        }
+        i.nsk = 0
+      }
+    }
+  }
+
+  def neighborhoodRestructuring1(): Unit = {
+    if (Config.secondPhase || Config.thirdPhase) {
+      tribes.foreach(tribe => {
+        var flag = false
+        tribe.getIndividuals.foreach(i => {
+          if (i.fitnessValue < tribe.bestSoFarValue) {
+            tribe.bestSoFarValue = i.fitnessValue
+            tribe.nsk = 0
+            flag = true
+          }
+        })
+        if (!flag)
+          tribe.nsk += 1
+      })
+    }
+    if (Config.secondPhase || Config.thirdPhase) {
+      tribes.foreach(tribe => {
+        neighborhoodRestructure(tribe)
+      })
+    }
   }
 
   def neighborhoodRestructure(tribe: Neighborhood): Unit = {
@@ -142,7 +177,7 @@ object TribalRunner {
       }
       val newTopology = TopologyFactory.create(tribe.topologyIndex, tribe.getIndividuals.length)
       if (newTopology != null)
-        tribe.topology = newTopology
+        tribe.setTopology(newTopology)
       else
         tribe.topologyIndex = tempIndex
       tribe.nsk = 0
@@ -160,26 +195,6 @@ object TribalRunner {
       }
     })
     best
-  }
-
-  def logBestSoFar(): Unit = {
-    val t = findIntraTribalBest()
-    bestSoFar = if (bestSoFar == null) {
-      t.copy()
-    } else bestSoFar
-    if (t.fitnessValue < bestSoFar.fitnessValue) {
-      bestSoFar.fitnessValue = t.fitnessValue
-      bestSoFar.vector_(t.vector)
-    }
-    MyLogger.logInfo(bestSoFar.fitnessValue)
-  }
-
-  def unify(): Neighborhood = {
-    var all = new ArrayBuffer[Individual]()
-    tribes.foreach(tribe => {
-      all ++= tribe.getIndividuals
-    })
-    new Neighborhood(all.toArray, TopologyFactory.create(0, all.size), new CAModule)
   }
 
   def checkCount() = {

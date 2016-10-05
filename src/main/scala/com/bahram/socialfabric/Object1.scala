@@ -1,11 +1,12 @@
 package com.bahram.socialfabric
 
 import com.bahram.ca.KSEnum
+import com.bahram.pso.Particle
 import com.bahram.socialfabric.topology.{RingTopology, TopologyEnum}
 import com.bahram.util.RandomUtil
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.util.Random
 import scala.util.control.Breaks
 
@@ -93,12 +94,20 @@ object Object1 {
 
     var tt = Iterable(1, 2, 3)
     println(tt.getClass)
+
+    var i = 0
+    var ttt = ArrayBuffer.fill[Int](3) {
+      i+=1
+      i
+    }
+    ttt = ttt.-(2)
+    println(ttt(0))
   }
 
   def foo(x: Array[String]) = x.foldLeft("")((a, b) => a + b)
 
   def textF(func1: ((Int, Double) => Unit)) = {
-    println(func1(10, 10.0));
+    println(func1(10, 10.0))
   }
 
   def func1(i: Int, d: Double) = {

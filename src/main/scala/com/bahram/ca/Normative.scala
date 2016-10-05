@@ -11,10 +11,10 @@ import main.scala.com.bahram.ca.TribalRunner
 class Normative() extends KnowledgeSource {
 
   var best: Individual = _
-  var lb = Array.fill[Double](TopologyFactory.dimension)(Double.MaxValue)
-  var ub = Array.fill[Double](TopologyFactory.dimension)(Double.MinValue)
-  var pl = Array.fill[Double](TopologyFactory.dimension)(Double.MaxValue)
-  var pu = Array.fill[Double](TopologyFactory.dimension)(Double.MinValue)
+  var lb = Array.fill[Double](Config.dimension)(Double.MaxValue)
+  var ub = Array.fill[Double](Config.dimension)(Double.MinValue)
+  var pl = Array.fill[Double](Config.dimension)(Double.MaxValue)
+  var pu = Array.fill[Double](Config.dimension)(Double.MinValue)
 
   override def update(population: Array[Individual], fitness: (Array[Double]) => Double): Array[Individual] = {
     scala.util.Sorting.stableSort[Individual](population, Config.compareAsc _)

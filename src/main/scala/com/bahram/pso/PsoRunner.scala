@@ -23,13 +23,13 @@ object PsoRunner {
   def extra(individual: Individual): Unit = {
     val p: Particle = individual.asInstanceOf[Particle]
     p.bestVector_(p.vector)
-    p.bestFitness = p.fitnessValue
+    p.bestSoFarFitness = p.fitnessValue
   }
 
   def make(size: Int): Array[Individual] = {
     val result = new Array[Individual](size)
     for (i <- 0.until(size)) {
-      result(i) = new Particle(TopologyFactory.dimension)
+      result(i) = new Particle(Config.dimension)
     }
     result
   }

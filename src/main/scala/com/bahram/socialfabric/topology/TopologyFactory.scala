@@ -5,7 +5,6 @@ import scala.collection.mutable
 
 object TopologyFactory {
 
-  val dimension = 10
 
   def create(index: Int, size: Int): Topology = {
     if (index >= TopologyEnum.values.size || index < 0)
@@ -14,7 +13,7 @@ object TopologyFactory {
     TopologyPool.getTopology(enum, size)
   }
 
-  private def create(enum: TopologyEnum.Value, size: Int): Topology = {
+  def create(enum: TopologyEnum.Value, size: Int): Topology = {
     enum match {
       case TopologyEnum.GLOBAL => new GlobalTopology(size)
       case TopologyEnum.MESH => new MeshTopology(size)

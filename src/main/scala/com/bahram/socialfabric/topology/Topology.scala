@@ -1,8 +1,12 @@
 package com.bahram.socialfabric.topology
 
+import scala.collection.mutable.ArrayBuffer
+
 abstract class Topology {
 
-  def createMatrix(): Array[Array[Int]]
+  protected var m: Array[ArrayBuffer[Int]] = _
 
-  def getNeighbors(index: Int): Array[Int]
+  def createMatrix(): Array[ArrayBuffer[Int]]
+
+  def getNeighbors(index: Int): ArrayBuffer[Int]
 }

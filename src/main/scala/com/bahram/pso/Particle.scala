@@ -6,7 +6,7 @@ class Particle(n: Int) extends Individual(n) {
 
   private val _bestVector = new Array[Double](n)
   private val _velocity = new Array[Double](n)
-  var bestFitness: Double = Double.MaxValue
+  var bestSoFarFitness: Double = Double.MaxValue
 
   def velocity: Array[Double] = {
     _velocity

@@ -4,6 +4,7 @@ import com.bahram.ca._
 import com.bahram.socialfabric.topology.Topology
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 class Neighborhood(_individuals: Array[Individual], t: Topology, caModule: CAModule) {
 
@@ -12,17 +13,14 @@ class Neighborhood(_individuals: Array[Individual], t: Topology, caModule: CAMod
     ksCount += (enum -> 0)
   })
   val individuals_ = _individuals
-  var topology: Topology = t
   var cAModule: CAModule = caModule
   var bestSoFarValue = Double.MaxValue
   var nsk = 0
   var topologyIndex = Config.topologyType
   var best: Individual = _
   var bestIndex = -1
-
-//  def evolutionStep(): Unit = {
-  //    Config.evolutionStep(this, Config.fitness)
-  //  }
+  private var topology: Topology = t
+  setTopology(t)
 
   def getIndividuals = individuals_
 
@@ -37,8 +35,13 @@ class Neighborhood(_individuals: Array[Individual], t: Topology, caModule: CAMod
     _individuals(i).fitnessValue
   }
 
+  def getBestOfNeighborhood(index: Int): Individual = {
+    val i = getBestIndexOfNeighborhood(index)
+    _individuals(i)
+  }
+
   def getBestIndexOfNeighborhood(index: Int): Int = {
-    val neighbors: Array[Int] = topology.getNeighbors(index)
+    val neighbors = topology.getNeighbors(index)
     var min = Double.MaxValue
     var minIndex = -1
     neighbors foreach { i => {
@@ -49,11 +52,6 @@ class Neighborhood(_individuals: Array[Individual], t: Topology, caModule: CAMod
     }
     }
     minIndex
-  }
-
-  def getBestOfNeighborhood(index: Int): Individual = {
-    val i = getBestIndexOfNeighborhood(index)
-    _individuals(i)
   }
 
   def findBestIndividual(): Individual = {
@@ -69,9 +67,49 @@ class Neighborhood(_individuals: Array[Individual], t: Topology, caModule: CAMod
     best
   }
 
+  def getBestOfNeighborhood2(index: Int): Individual = {
+    var minValue = Double.MaxValue
+    var minIndex = -1
+    individuals_(index).neighbors.foreach(i => {
+      if (i >= 0 && individuals_(i).fitnessValue < minValue) {
+        minValue = individuals_(i).fitnessValue
+        minIndex = i
+      }
+    })
+    individuals_(minIndex)
+  }
+
+  def getNeighbors(index: Int): ArrayBuffer[Int] = {
+    this.topology.getNeighbors(index)
+  }
+
+  def getNeighbors2(index: Int): ArrayBuffer[Int] = {
+    individuals_(index).neighbors
+  }
+
   def getBestIndividual = best
 
   def flag = _individuals == individuals_
 
+  def getTopology = topology
 
+  def setTopology(t: Topology): Unit = {
+    this.topology = t
+    for (i <- this.individuals_.indices) {
+      this.individuals_(i).neighbors = t.getNeighbors(i)
+      val neighbors = this.individuals_(i).neighbors
+      var temp = -1
+      val otherNeighbors = ArrayBuffer.fill[Int](Config.populationSize) {
+        temp += 1
+        temp
+      } //this.individuals_(i).otherNeighbors
+      otherNeighbors.remove(i)
+      for (i <- neighbors) {
+        val index = otherNeighbors.indexOf(i)
+        if (index >= 0)
+          otherNeighbors.remove(index)
+      }
+      this.individuals_(i).otherNeighbors = otherNeighbors
+    }
+  }
 }

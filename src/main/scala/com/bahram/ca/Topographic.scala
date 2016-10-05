@@ -35,7 +35,7 @@ class Topographic extends KnowledgeSource {
             if (c.depth < Config.maxTopoDepth) {
               c.best = p.fitnessValue
               var ind = -1
-              val a_t = ArrayBuffer.fill[Int](TopologyFactory.dimension)({
+              val a_t = ArrayBuffer.fill[Int](Config.dimension)({
                 ind += 1
                 ind
               })
@@ -46,7 +46,7 @@ class Topographic extends KnowledgeSource {
               indexes.foreach(index => {
                 val c1 = new Cell
                 val c2 = new Cell
-                for (i <- 0 until TopologyFactory.dimension) {
+                for (i <- 0 until Config.dimension) {
                   c1.u(i) = c.u(i)
                   c2.u(i) = c.u(i)
                   c1.l(i) = c.l(i)
@@ -134,8 +134,8 @@ object StateEnum extends Enumeration {
 class Cell {
   val logger = Logger.getLogger(classOf[Cell])
 
-  var u: Array[Double] = Array.fill(TopologyFactory.dimension)(100.0)
-  var l: Array[Double] = Array.fill(TopologyFactory.dimension)(-100.0)
+  var u: Array[Double] = Array.fill(Config.dimension)(100.0)
+  var l: Array[Double] = Array.fill(Config.dimension)(-100.0)
   var state: StateEnum.Value = _
   var depth = 0
   var pointer: ListBuffer[Cell] = new ListBuffer[Cell]()

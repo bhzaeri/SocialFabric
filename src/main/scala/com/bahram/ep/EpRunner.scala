@@ -27,7 +27,7 @@ object EpRunner {
   def make(size: Int): Array[Individual] = {
     val result = new Array[Individual](size)
     for (i <- 0.until(size)) {
-      result(i) = new EpIndividual(TopologyFactory.dimension)
+      result(i) = new EpIndividual(Config.dimension)
     }
     result
   }

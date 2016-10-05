@@ -1,7 +1,7 @@
 package com.bahram.pso
 
 import com.bahram.ca.{Config, KSEnum}
-import com.bahram.socialfabric.topology.{GlobalTopology, RingTopology, TopologyFactory}
+import com.bahram.socialfabric.topology.{GlobalTopology, RingTopology}
 import com.bahram.socialfabric.{Individual, Neighborhood}
 import com.bahram.util.RandomUtil
 import main.scala.com.bahram.ca.TribalRunner
@@ -14,14 +14,14 @@ object PSOFactory {
 
   val logger = Logger.getLogger(this.getClass)
 
-  def pso1(self: Particle, best: Particle) = {
+  def pso1(self: Particle, bestVector: Array[Double]) = {
     val dimSize = self.vector.length
     val c1 = 2.0
     val c2 = 2.0
     for (d <- 0 until dimSize) {
       val r1 = RandomUtil.nextDouble()
       val r2 = RandomUtil.nextDouble()
-      self.velocity(d) = 0.6 * self.velocity(d) + r1 * c1 * (self.bestVector(d) - self.vector(d)) + r2 * c2 * (best.vector(d) - self.vector(d))
+      self.velocity(d) = 0.6 * self.velocity(d) + r1 * c1 * (self.bestVector(d) - self.vector(d)) + r2 * c2 * (bestVector(d) - self.vector(d))
     }
   }
 
@@ -30,10 +30,10 @@ object PSOFactory {
       if (Config.secondPhase || Config.thirdPhase) {
         val individuals = neighborhood.getIndividuals
         for (i <- individuals.indices) {
-          val neighbors = neighborhood.topology.getNeighbors(i)
+          val neighbors = neighborhood.getNeighbors(i)
           val map = new mutable.HashMap[KSEnum.Value, Int]()
 
-          if (neighborhood.topology.isInstanceOf[RingTopology]) {
+          if (neighborhood.getTopology.isInstanceOf[RingTopology]) {
             val l = individuals.length
             val ks1 = individuals((i - 1 + l) % l).ksType
             val ks2 = individuals((i + 1) % l).ksType
@@ -47,12 +47,13 @@ object PSOFactory {
             individuals(i).nextKsType = newKS
           } else {
             map(individuals(i).ksType) = 1
-            for (j <- neighbors.indices) {
-              if (map.keySet.contains(individuals(j).ksType))
-                map(individuals(j).ksType) += 1
-              else map(individuals(j).ksType) = 1
+            for (j <- neighbors) {
+              if (j >= 0) {
+                if (map.keySet.contains(individuals(j).ksType))
+                  map(individuals(j).ksType) += 1
+                else map(individuals(j).ksType) = 1
+              }
             }
-
 
             if (TribalRunner.tribes.length > 1 && individuals(i) == neighborhood.best) {
               val tribes = TribalRunner.tribes
@@ -64,7 +65,7 @@ object PSOFactory {
             }
 
             val sorted = map.toSeq.sortWith((a, b) => a._2 > b._2)
-            if (sorted.length == 1 && neighborhood.topology.isInstanceOf[GlobalTopology]) {
+            if (sorted.length == 1 && neighborhood.getTopology.isInstanceOf[GlobalTopology]) {
               individuals(i).nextKsType = TieBreakingRules.random(neighborhood, individuals(i))
             } else if (sorted.length == 1 || sorted.head._2 > sorted(1)._2)
               individuals(i).nextKsType = sorted.head._1
@@ -88,19 +89,77 @@ object PSOFactory {
     if (iteration % Config.wSize == 0) {
       val newPop = neighborhood.cAModule.update(neighborhood, fitness)
       neighborhood.setIndividuals(newPop)
-//      assert(neighborhood.getIndividuals.length % 2 == 0)
+      //      assert(neighborhood.getIndividuals.length % 2 == 0)
       return true
     }
     false
   }
 
+  def applySocialFabric2(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double] => Double)): Boolean = {
+    if (iteration % Config.wSize == 0) {
+      if (Config.secondPhase || Config.thirdPhase) {
+        val individuals = neighborhood.getIndividuals
+        for (i <- individuals.indices) {
+          val neighbors = individuals(i).neighbors
+          val map = new mutable.HashMap[KSEnum.Value, Int]()
+
+          /*          if (neighborhood.getTopology.isInstanceOf[RingTopology]) {
+                      val l = individuals.length
+                      val ks1 = individuals((i - 1 + l) % l).ksType
+                      val ks2 = individuals((i + 1) % l).ksType
+                      var newKS: KSEnum.Value = null
+                      if (ks1 == ks2) {
+                        newKS = Config.tieBreakingRule(neighborhood, individuals(i))
+                      }
+                      else {
+                        newKS = ks1
+                      }
+                      individuals(i).nextKsType = newKS
+                    } else */
+          {
+            map(individuals(i).ksType) = 1
+            for (j <- neighbors) {
+              if (map.keySet.contains(individuals(j).ksType))
+                map(individuals(j).ksType) += 1
+              else map(individuals(j).ksType) = 1
+            }
+
+            if (TribalRunner.tribes.length > 1 && individuals(i) == neighborhood.best) {
+              val tribes = TribalRunner.tribes
+              tribes.foreach(tribe => {
+                if (map.keySet.contains(tribe.best.ksType))
+                  map(tribe.best.ksType) += 1
+                else map(tribe.best.ksType) = 1
+              })
+            }
+
+            val sorted = map.toSeq.sortWith((a, b) => a._2 > b._2)
+            if (sorted.length == 1 && neighbors.length == Config.populationSize - 1) // neighborhood.getTopology.isInstanceOf[GlobalTopology])
+              individuals(i).nextKsType = TieBreakingRules.random(neighborhood, individuals(i))
+            else if (sorted.length == 1 || sorted.head._2 > sorted(1)._2)
+              individuals(i).nextKsType = sorted.head._1
+            else
+              individuals(i).nextKsType = Config.tieBreakingRule(neighborhood, individuals(i))
+          }
+          assert(individuals(i).nextKsType != null)
+        }
+        individuals.foreach(i => {
+          i.ksType = i.nextKsType
+          i.nextKsType = null
+        })
+      }
+      applyNormalCA(iteration, neighborhood, fitness)
+      return true
+    }
+    false
+  }
 
   def population(result: Array[Individual], extra: (Individual => Unit), fitness: (Array[Double] => Double)): Array[Individual] = {
     val rand = RandomUtil
     val size = result.length
     for (i <- 0 until size) {
       val p = result(i) // new Particle(dimension);
-      val vector = new Array[Double](TopologyFactory.dimension)
+      val vector = new Array[Double](Config.dimension)
       for (j <- vector.indices) {
         vector(j) = rand.nextDouble() * Config.upperBound + Config.lowerBound
       }

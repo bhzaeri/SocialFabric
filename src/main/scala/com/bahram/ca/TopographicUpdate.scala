@@ -1,6 +1,6 @@
 package main.java.com.bahram.ca
 
-import com.bahram.ca.{Cell, StateEnum}
+import com.bahram.ca.{Cell, Config, StateEnum}
 import com.bahram.socialfabric.Individual
 import com.bahram.socialfabric.topology.TopologyFactory
 import com.bahram.util.RandomUtil
@@ -14,7 +14,7 @@ object TopographicUpdate {
     val alpha = RandomUtil.nextDouble()
     if (c.state == StateEnum.H)
       for (j <- t.vector.indices) {
-        t.vector(j) = best.vector(j) + alpha * Math.sqrt(parent.fitnessValue) / TopologyFactory.dimension
+        t.vector(j) = best.vector(j) + alpha * Math.sqrt(parent.fitnessValue) / Config.dimension
         if (t.vector(j) < c.l(j))
           t.vector(j) = c.l(j)
         if (t.vector(j) > c.u(j))

@@ -14,4 +14,6 @@ object RandomUtil {
   def nextInt(): Int = random.nextInt()
 
   def nextInt(n: Int): Int = random.nextInt(n)
+
+  def nextGaussian(mean: Double, stdDev: Double): Double = random.nextGaussian() * stdDev + mean
 }

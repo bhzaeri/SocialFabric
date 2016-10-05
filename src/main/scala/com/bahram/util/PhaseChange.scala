@@ -9,21 +9,23 @@ import main.scala.com.bahram.ca.TribalRunner
   */
 object PhaseChange {
   val phases = Array(0.2, 0.5)
-  var index = 0
 
   def checkChange() = {
     if (Config.countFEs > 30000) {
       var ggg = 0
     }
-    if (index < phases.length && Config.countFEs == (phases(index) * Config.maxFEs).asInstanceOf[Int]) {
+    if (Config.phaseIndex < phases.length && Config.countFEs == (phases(Config.phaseIndex) * Config.maxFEs).asInstanceOf[Int]) {
       Config.secondPhase = !Config.secondPhase
       if (Config.secondPhase) {
+        Config.stepUpNsk = (i) => {
+          i.nsk += 1
+        }
         TribalRunner.tribes.foreach(tribe => {
-          tribe.topology = TopologyFactory.create(Config.topologyType, TribalRunner.popSize)
+          tribe.setTopology(TopologyFactory.create(Config.topologyType, Config.populationSize))
         })
       }
-      index += 1
-      if (index == 2)
+      Config.phaseIndex += 1
+      if (Config.phaseIndex == 2)
         Config.thirdPhase = true
     }
   }

@@ -9,16 +9,15 @@ class MeshTopology(n: Int) extends Topology {
 
   val h: Int = Math.floor(Math.sqrt(n / 2)).asInstanceOf[Int]
   val logger = Logger.getLogger(classOf[MeshTopology])
-  private var m: Array[Array[Int]] = _
 
-  override def getNeighbors(index: Int): Array[Int] = {
+  override def getNeighbors(index: Int): ArrayBuffer[Int] = {
     if (m == null)
       createMatrix()
     m(index)
   }
 
-  override def createMatrix(): Array[Array[Int]] = {
-    m = new Array[Array[Int]](n)
+  override def createMatrix(): Array[ArrayBuffer[Int]] = {
+    m = new Array[ArrayBuffer[Int]](n)
     var l: Int = n / h
     if (n > h * l)
       l += 1
@@ -41,7 +40,7 @@ class MeshTopology(n: Int) extends Topology {
             if (j + 1 < l && counter + 1 < n)
               list += counter + 1
 
-            m(counter) = list.toArray
+            m(counter) = list
             counter += 1
             if (counter >= n) {
               inner.break()
