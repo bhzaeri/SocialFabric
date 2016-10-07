@@ -15,22 +15,22 @@ object Object1 {
     var age: Long = 1E18.asInstanceOf[Long]
     println(age)
     //    var i = new Individual(80);
-    var ii = new Array[Array[Int]](9);
-    ii(0) = new Array[Int](9);
+    var ii = new Array[Array[Int]](9)
+    ii(0) = new Array[Int](9)
     ii(0)(0) = 90
     println("concat arguments = " + foo(args))
-    var loop = new Breaks();
+    var loop = new Breaks()
     loop.breakable {
       for (i <- 0 until 10) {
-        println(i);
+        println(i)
         loop.break()
       }
     }
-    var m = new RingTopology(10).createMatrix();
-    println(m(0)(0));
-    textF(func1);
+    var m = new RingTopology(10).createMatrix()
+    println(m(0)(0))
+    textF(func1)
     for (i <- 0 until 5) {
-      println(i);
+      println(i)
     }
     var ll = new ListBuffer[Int]
     ll.+=(10)
