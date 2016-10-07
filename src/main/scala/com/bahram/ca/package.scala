@@ -19,7 +19,7 @@ package object ca {
     val lowerBound = -100
     val upperBound = 100
     val maxTopoDepth = 50
-    val dimension = 30
+    val dimension = 10
     var mThresh = 3
     var wSize = 5
     var topologyType = 3
