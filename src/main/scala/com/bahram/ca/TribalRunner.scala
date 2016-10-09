@@ -55,7 +55,7 @@ object TribalRunner {
 
       tribes.foreach(tribe => {
         if (Config.applyCA != null) {
-          Config.applyCA(Config.iter, tribe, Config.fitness)
+          Config.applyCA(Config.iter, tribe, true, Config.fitness)
         }
       })
 
@@ -86,6 +86,19 @@ object TribalRunner {
     MyLogger.logInfo(bestSoFar.fitnessValue)
   }
 
+  def findIntraTribalBest(): Individual = {
+    var minValue = Double.MaxValue
+    var best: Individual = null
+    tribes.foreach(tribe => {
+      val temp = tribe.best
+      if (temp.fitnessValue < minValue) {
+        minValue = temp.fitnessValue
+        best = temp
+      }
+    })
+    best
+  }
+
   def unify(): Neighborhood = {
     var all = new ArrayBuffer[Individual]()
     Config.populationSize *= Config.tribeNumber
@@ -105,8 +118,7 @@ object TribalRunner {
   }
 
   def neighborhoodRestructuring2(): Unit = {
-    if (Config.secondPhase || Config.thirdPhase)
-    {
+    if (Config.secondPhase || Config.thirdPhase) {
       tribes.foreach(tribe => {
         neighborhoodRestructuring2(tribe)
       })
@@ -182,19 +194,6 @@ object TribalRunner {
         tribe.topologyIndex = tempIndex
       tribe.nsk = 0
     }
-  }
-
-  def findIntraTribalBest(): Individual = {
-    var minValue = Double.MaxValue
-    var best: Individual = null
-    tribes.foreach(tribe => {
-      val temp = tribe.best
-      if (temp.fitnessValue < minValue) {
-        minValue = temp.fitnessValue
-        best = temp
-      }
-    })
-    best
   }
 
   def checkCount() = {

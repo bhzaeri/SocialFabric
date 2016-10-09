@@ -44,8 +44,8 @@ package object ca {
     var tieBreakingRule: (Neighborhood, Individual) => KSEnum.Value = _
     var calculateNewPopulation: (Int, Neighborhood, (Array[Double]) => Double) => Unit = _
     var applyNewPosition: (Neighborhood, (Array[Double]) => Double) => Unit = _
-    var applyCA: (Int, Neighborhood, (Array[Double] => Double)) => Boolean = _
-    var epGenerateStrategy: (Int, Neighborhood, (Array[Double] => Double)) => Boolean = _
+    var applyCA: (Int, Neighborhood, Boolean, (Array[Double] => Double)) => Boolean = _
+    var epGenerateStrategy: (Int, Neighborhood, Boolean, (Array[Double] => Double)) => Boolean = _
     var neighborhoodRestructuring: () => Unit = _
     var resetNeighborhood: (ArrayBuffer[Individual]) => Unit = (ids) => {}
     var stepUpNsk: (Individual) => Unit = _

@@ -25,7 +25,7 @@ object PSOFactory {
     }
   }
 
-  def applySocialFabric(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double] => Double)): Boolean = {
+  def applySocialFabric(iteration: Int, neighborhood: Neighborhood, mergeOutput: Boolean, fitness: (Array[Double] => Double)): Boolean = {
     if (iteration % Config.wSize == 0) {
       if (Config.secondPhase || Config.thirdPhase) {
         val individuals = neighborhood.getIndividuals
@@ -79,23 +79,13 @@ object PSOFactory {
           i.nextKsType = null
         })
       }
-      applyNormalCA(iteration, neighborhood, fitness)
+      applyNormalCA(iteration, neighborhood, mergeOutput, fitness)
       return true
     }
     false
   }
 
-  def applyNormalCA(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double] => Double)): Boolean = {
-    if (iteration % Config.wSize == 0) {
-      val newPop = neighborhood.cAModule.update(neighborhood, fitness)
-      neighborhood.setIndividuals(newPop)
-      //      assert(neighborhood.getIndividuals.length % 2 == 0)
-      return true
-    }
-    false
-  }
-
-  def applySocialFabric2(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double] => Double)): Boolean = {
+  def applySocialFabric2(iteration: Int, neighborhood: Neighborhood, mergeOutput: Boolean, fitness: (Array[Double] => Double)): Boolean = {
     if (iteration % Config.wSize == 0) {
       if (Config.secondPhase || Config.thirdPhase) {
         val individuals = neighborhood.getIndividuals
@@ -148,7 +138,17 @@ object PSOFactory {
           i.nextKsType = null
         })
       }
-      applyNormalCA(iteration, neighborhood, fitness)
+      applyNormalCA(iteration, neighborhood, mergeOutput, fitness)
+      return true
+    }
+    false
+  }
+
+  def applyNormalCA(iteration: Int, neighborhood: Neighborhood, mergeOutput: Boolean, fitness: (Array[Double] => Double)): Boolean = {
+    if (iteration % Config.wSize == 0) {
+      val newPop = neighborhood.cAModule.update(neighborhood, mergeOutput, fitness)
+      neighborhood.setIndividuals(newPop)
+      //      assert(neighborhood.getIndividuals.length % 2 == 0)
       return true
     }
     false

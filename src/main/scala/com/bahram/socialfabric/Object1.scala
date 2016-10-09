@@ -1,7 +1,6 @@
 package com.bahram.socialfabric
 
 import com.bahram.ca.KSEnum
-import com.bahram.pso.Particle
 import com.bahram.socialfabric.topology.{RingTopology, TopologyEnum}
 import com.bahram.util.RandomUtil
 
@@ -96,10 +95,11 @@ object Object1 {
     println(tt.getClass)
 
     var i = 0
-    var ttt = ArrayBuffer.fill[Int](3) {
-      i+=1
+    var ttt = ArrayBuffer.fill[Int](10) {
+      i += 1
       i
     }
+    println(ttt.slice(0, 4).mkString)
     ttt = ttt.-(2)
     println(ttt(0))
   }

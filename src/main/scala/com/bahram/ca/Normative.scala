@@ -1,7 +1,6 @@
 package com.bahram.ca
 
 import com.bahram.socialfabric.Individual
-import com.bahram.socialfabric.topology.TopologyFactory
 import main.scala.com.bahram.ca.TribalRunner
 
 
@@ -16,7 +15,7 @@ class Normative() extends KnowledgeSource {
   var pl = Array.fill[Double](Config.dimension)(Double.MaxValue)
   var pu = Array.fill[Double](Config.dimension)(Double.MinValue)
 
-  override def update(population: Array[Individual], fitness: (Array[Double]) => Double): Array[Individual] = {
+  override def update(population: Array[Individual], mergeOutput: Boolean, fitness: (Array[Double]) => Double): Array[Individual] = {
     scala.util.Sorting.stableSort[Individual](population, Config.compareAsc _)
     val l = population.length
     if (best == null || population(0).fitnessValue < best.fitnessValue) {

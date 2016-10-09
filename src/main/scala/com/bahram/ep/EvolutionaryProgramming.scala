@@ -56,7 +56,7 @@ object EvolutionaryProgramming {
   def calculateNewPopulation(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
     val popSize = neighborhood.getIndividuals.length
     //neighborhood.cAModule.update2(neighborhood, fitness) //new Array[EpIndividual](popSize)
-    Config.epGenerateStrategy(iteration, neighborhood, fitness)
+    Config.epGenerateStrategy(iteration, neighborhood, false, fitness)
     //    for (i <- 0 until popSize) {
     //      //      children(i) = mutate(neighborhood.getIndividuals(i)).asInstanceOf[EpIndividual]
     //      children(i).fitnessValue = fitness(children(i).vector)

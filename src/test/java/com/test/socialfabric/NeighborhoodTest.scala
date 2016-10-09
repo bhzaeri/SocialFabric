@@ -24,7 +24,7 @@ class NeighborhoodTest extends FunSuite with BeforeAndAfter {
     var population = PSOFactory.population(PsoRunner.make(100), PsoRunner.extra, fitness)
     population(0).fitnessValue = 100.0
     population(0).fitnessValue = 150.0
-    population = new Situational().update(population, fitness)
+    population = new Situational().update(population, true, fitness)
     assert(population.length == size)
     assert(population(0).fitnessValue > population(1).fitnessValue)
   }
@@ -33,7 +33,7 @@ class NeighborhoodTest extends FunSuite with BeforeAndAfter {
     val size = 100;
     val fitness = FitnessFactory.factory(2)
     val population = PSOFactory.population(PsoRunner.make(100), PsoRunner.extra, fitness)
-    new Situational().update(population, fitness)
+    new Situational().update(population, true, fitness)
   }
 
   test("funcion") {

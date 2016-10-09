@@ -10,7 +10,7 @@ import main.scala.com.bahram.ca.TribalRunner
 class Situational extends KnowledgeSource {
   var best: Individual = _
 
-  override def update(population: Array[Individual], fitness: Array[Double] => Double): Array[Individual] = {
+  override def update(population: Array[Individual], mergeOutput: Boolean, fitness: Array[Double] => Double): Array[Individual] = {
     scala.util.Sorting.stableSort[Individual](population, Config.compareAsc _)
     val l = population.length
     if (best == null || population(0).fitnessValue < best.fitnessValue) {
@@ -31,7 +31,6 @@ class Situational extends KnowledgeSource {
           t.vector(j) = Config.lowerBound
         if (t.vector(j) > Config.upperBound)
           t.vector(j) = Config.upperBound
-
       }
       t.fitnessValue = fitness(t.vector)
       TribalRunner.checkCount()

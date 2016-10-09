@@ -12,18 +12,18 @@ import scala.util.control.Breaks
 class CAModule {
   val knowledgeSources: Map[KSEnum.Value, KnowledgeSource] = Map(KSEnum.SITUATIONAL -> new Situational, KSEnum.NORMATIVE -> new Normative, KSEnum.TOPOGRAPHIC -> new Topographic)
 
-  def update(neighborhood: Neighborhood, fitness: (Array[Double] => Double)): Array[Individual] = {
+  def update(neighborhood: Neighborhood, mergeOutput: Boolean, fitness: (Array[Double] => Double)): Array[Individual] = {
     val population = neighborhood.getIndividuals
-    val offSprings = update2(neighborhood, fitness)
+    val offSprings = update2(neighborhood, mergeOutput, fitness)
 
     val length = population.length
     val population2 = population ++ offSprings
     scala.util.Sorting.stableSort[Individual](population2, Config.compareAsc _)
-//    population2.slice(0, length)
+    //    population2.slice(0, length)
     population2
   }
 
-  def update2(neighborhood: Neighborhood, fitness: (Array[Double] => Double)): Array[Individual] = {
+  def update2(neighborhood: Neighborhood, mergeOutput: Boolean, fitness: (Array[Double] => Double)): Array[Individual] = {
     val population = neighborhood.getIndividuals
     val temp = new mutable.HashMap[KSEnum.Value, Double]
     var sum = 0.0
@@ -54,7 +54,7 @@ class CAModule {
     assert(ks != null)
     neighborhood.ksCount(ks) += 1L
     //    val selected = neighborhood.individuals_ filter (p => p.ksType == ks)
-    knowledgeSources(ks).update(population, fitness)
+    knowledgeSources(ks).update(population, mergeOutput, fitness)
   }
 }
 

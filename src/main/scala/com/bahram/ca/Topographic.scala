@@ -1,7 +1,6 @@
 package com.bahram.ca
 
 import com.bahram.socialfabric.Individual
-import com.bahram.socialfabric.topology.TopologyFactory
 import com.bahram.util.{MyLogger, RandomUtil}
 import main.scala.com.bahram.ca.TribalRunner
 import org.apache.log4j.Logger
@@ -17,7 +16,7 @@ class Topographic extends KnowledgeSource {
   var cells: ArrayBuffer[Cell] = new ArrayBuffer[Cell]
   cells.+=(new Cell)
 
-  override def update(population: Array[Individual], fitness: (Array[Double]) => Double): Array[Individual] = {
+  override def update(population: Array[Individual], mergeOutput: Boolean, fitness: (Array[Double]) => Double): Array[Individual] = {
     scala.util.Sorting.stableSort[Individual](population, Config.compareAsc _)
     if (best == null || population(0).fitnessValue < best.fitnessValue) {
       best = population(0)

@@ -7,6 +7,6 @@ import com.bahram.socialfabric.Individual
   */
 abstract class KnowledgeSource {
 
-  def update(population: Array[Individual], fitness: (Array[Double] => Double)): Array[Individual]
+  def update(population: Array[Individual], mergeOutput: Boolean, fitness: (Array[Double] => Double)): Array[Individual]
 
 }

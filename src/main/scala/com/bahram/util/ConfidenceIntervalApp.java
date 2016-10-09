@@ -27,7 +27,7 @@ public class ConfidenceIntervalApp {
     private static double calcMeanCI(SummaryStatistics stats, double level) {
         try {
             // Create T Distribution with N-1 degrees of freedom
-            TDistribution tDist = new TDistribution(stats.getN() - 1);
+            TDistribution tDist = new TDistribution(0);//stats.getN() - 1);
             // Calculate critical value
             double alpha = 1.0 - (1 - level) / 2;
             double critVal = tDist.inverseCumulativeProbability(alpha);
