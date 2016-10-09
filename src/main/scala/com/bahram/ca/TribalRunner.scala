@@ -71,14 +71,12 @@ object TribalRunner {
   }
 
   def configure(funcIndex: Int) = {
-    Configure.tpso(funcIndex)
+    Configure.sfpso(funcIndex)
   }
 
   def logBestSoFar(): Unit = {
     val t = findIntraTribalBest()
-    bestSoFar = if (bestSoFar == null) {
-      t.copy()
-    } else bestSoFar
+    bestSoFar = if (bestSoFar == null) t.copy() else bestSoFar
     if (t.fitnessValue < bestSoFar.fitnessValue) {
       bestSoFar.fitnessValue = t.fitnessValue
       bestSoFar.vector_(t.vector)

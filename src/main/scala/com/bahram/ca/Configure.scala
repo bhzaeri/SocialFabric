@@ -16,7 +16,7 @@ object Configure {
 
   def sfep(funcIndex: Int) = {
     if (Config.filePrinter == null)
-      Config.filePrinter = new PrintWriter("src/main/resources/results/sfep_30.txt")
+      Config.filePrinter = new PrintWriter("src/main/resources/results/sfep.txt")
     Config.makePopulation = EpRunner.make
     Config.extra = EpRunner.extra
     Config.calculateNewPopulation = EvolutionaryProgramming.calculateNewPopulation
@@ -76,7 +76,7 @@ object Configure {
 
   def sfpso(funcIndex: Int) = {
     if (Config.filePrinter == null)
-      Config.filePrinter = new PrintWriter("src/main/resources/results/sfpso_30.txt")
+      Config.filePrinter = new PrintWriter("src/main/resources/results/sfpso.txt")
     Config.makePopulation = PsoRunner.make
     Config.extra = PsoRunner.extra
     Config.calculateNewPopulation = PSOAlgorithm.calculateNewPopulation

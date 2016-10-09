@@ -6,6 +6,7 @@ import com.bahram.util.RandomUtil
 import org.apache.commons.math3.distribution.TDistribution
 
 import scala.Double.MaxValue
+import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by zaeri on 04/10/16.
@@ -58,6 +59,8 @@ class ConfidenceNormative extends KnowledgeSource {
     val alphA: Double = 1.0 - (1 - level) / 2
     val critVal: Double = tDist.inverseCumulativeProbability(alphA)
 
+    var index = 0
+    val offSprings = Array.fill[Individual](Config.populationSize)(null)
     population.slice(0, s).foreach(i => {
       val child = i.copy
       val parent = i
@@ -76,8 +79,10 @@ class ConfidenceNormative extends KnowledgeSource {
       child.fitnessValue = fitness(child.vector)
       TribalRunner.checkCount()
       child.ksType = KSEnum.NORMATIVE
+      offSprings(index) = child
+      index += 1
     })
     counter += 1
-    null
+    offSprings
   }
 }

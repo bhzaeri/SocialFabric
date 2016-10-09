@@ -35,7 +35,7 @@ object EvolutionaryProgramming {
   }
 
   def applyNewPositions(neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
-    val popSize = neighborhood.getIndividuals.length
+    val popSize = Config.populationSize
     neighborhood.getIndividuals.foreach(c => tournament(c, neighborhood.getIndividuals, Config.boutSize))
     neighborhood.setIndividuals(neighborhood.getIndividuals.sortWith((a, b) => a.asInstanceOf[EpIndividual].wins > b.asInstanceOf[EpIndividual].wins))
     neighborhood.setIndividuals(neighborhood.getIndividuals.slice(0, popSize))

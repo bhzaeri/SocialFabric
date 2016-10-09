@@ -17,13 +17,13 @@ class CAModule {
     val offSprings = update2(neighborhood, mergeOutput, fitness)
 
     val length = population.length
-    val population2 = population ++ offSprings
+    val population2 = if (mergeOutput) population ++ offSprings else offSprings
     scala.util.Sorting.stableSort[Individual](population2, Config.compareAsc _)
     //    population2.slice(0, length)
     population2
   }
 
-  def update2(neighborhood: Neighborhood, mergeOutput: Boolean, fitness: (Array[Double] => Double)): Array[Individual] = {
+  private def update2(neighborhood: Neighborhood, mergeOutput: Boolean, fitness: (Array[Double] => Double)): Array[Individual] = {
     val population = neighborhood.getIndividuals
     val temp = new mutable.HashMap[KSEnum.Value, Double]
     var sum = 0.0
