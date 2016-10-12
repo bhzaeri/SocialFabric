@@ -13,6 +13,7 @@ class Neighborhood(_individuals: Array[Individual], t: Topology, caModule: CAMod
     ksCount += (enum -> 0)
   })
   val individuals_ = _individuals
+  var tempIndividuals: Array[Individual] = new Array[Individual](_individuals.length)
   var cAModule: CAModule = caModule
   var bestSoFarValue = Double.MaxValue
   var nsk = 0
@@ -27,6 +28,12 @@ class Neighborhood(_individuals: Array[Individual], t: Topology, caModule: CAMod
   def setIndividuals(population: Array[Individual]) = {
     for (i <- individuals_.indices) {
       individuals_(i) = population(i)
+    }
+  }
+
+  def setTempIndividuals(population: Array[Individual]) = {
+    for (i <- tempIndividuals.indices) {
+      tempIndividuals(i) = population(i)
     }
   }
 

@@ -16,7 +16,7 @@ object Configure {
 
   def sfep(funcIndex: Int) = {
     if (Config.filePrinter == null)
-      Config.filePrinter = new PrintWriter("src/main/resources/results/sfep.txt")
+      Config.filePrinter = new PrintWriter("src/main/resources/results/sfep_30_3.txt")
     Config.makePopulation = EpRunner.make
     Config.extra = EpRunner.extra
     Config.calculateNewPopulation = EvolutionaryProgramming.calculateNewPopulation
@@ -31,8 +31,8 @@ object Configure {
     Config.phaseIndex = 0
     Config.populationSize = 9
     Config.tribeNumber = 10
-    Config.normativeUpdate = NormativeUpdate.update2
-    Config.topographicUpdate = TopographicUpdate.update2
+    Config.normativeUpdate = NormativeUpdate.update1
+    Config.topographicUpdate = TopographicUpdate.update1
     Config.psoStrategy = PSOFactory.pso1
     Config.fitness = FitnessFactory.factory(funcIndex)
     Config.tieBreakingRule = TieBreakingRules.mfu
@@ -76,7 +76,7 @@ object Configure {
 
   def sfpso(funcIndex: Int) = {
     if (Config.filePrinter == null)
-      Config.filePrinter = new PrintWriter("src/main/resources/results/sfpso.txt")
+      Config.filePrinter = new PrintWriter("src/main/resources/results/sfpso_30_2.txt")
     Config.makePopulation = PsoRunner.make
     Config.extra = PsoRunner.extra
     Config.calculateNewPopulation = PSOAlgorithm.calculateNewPopulation

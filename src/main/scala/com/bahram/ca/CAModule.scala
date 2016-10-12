@@ -2,6 +2,7 @@ package com.bahram.ca
 
 import com.bahram.socialfabric.{Individual, Neighborhood}
 import com.bahram.util.RandomUtil
+import main.scala.com.bahram.ca.ConfidenceNormative
 
 import scala.collection.mutable
 import scala.util.control.Breaks
@@ -10,7 +11,7 @@ import scala.util.control.Breaks
   * Created by zaeri on 03/08/16.
   */
 class CAModule {
-  val knowledgeSources: Map[KSEnum.Value, KnowledgeSource] = Map(KSEnum.SITUATIONAL -> new Situational, KSEnum.NORMATIVE -> new Normative, KSEnum.TOPOGRAPHIC -> new Topographic)
+  val knowledgeSources: Map[KSEnum.Value, KnowledgeSource] = Map(KSEnum.SITUATIONAL -> new Situational, KSEnum.NORMATIVE -> new ConfidenceNormative, KSEnum.TOPOGRAPHIC -> new Topographic)
 
   def update(neighborhood: Neighborhood, mergeOutput: Boolean, fitness: (Array[Double] => Double)): Array[Individual] = {
     val population = neighborhood.getIndividuals

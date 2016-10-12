@@ -3,6 +3,7 @@ package com.bahram.ca
 import com.bahram.socialfabric.Individual
 import com.bahram.util.{MyLogger, RandomUtil}
 import main.scala.com.bahram.ca.TribalRunner
+import main.scala.com.bahram.util.UtilMethods
 import org.apache.log4j.Logger
 
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
@@ -110,6 +111,7 @@ class Topographic extends KnowledgeSource {
       val child = parent.copy()
       val c = parent.cell
       Config.topographicUpdate(child, best, parent, c)
+      UtilMethods.adjustBoundaries(child)
       child.fitnessValue = fitness(child.vector)
       TribalRunner.checkCount()
       child.ksType = KSEnum.TOPOGRAPHIC

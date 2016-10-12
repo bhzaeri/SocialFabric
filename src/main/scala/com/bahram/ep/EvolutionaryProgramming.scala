@@ -36,9 +36,11 @@ object EvolutionaryProgramming {
 
   def applyNewPositions(neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
     val popSize = Config.populationSize
-    neighborhood.getIndividuals.foreach(c => tournament(c, neighborhood.getIndividuals, Config.boutSize))
+    var temp = neighborhood.individuals_ ++ neighborhood.tempIndividuals
+    temp.foreach(c => tournament(c, neighborhood.getIndividuals, Config.boutSize))
     neighborhood.setIndividuals(neighborhood.getIndividuals.sortWith((a, b) => a.asInstanceOf[EpIndividual].wins > b.asInstanceOf[EpIndividual].wins))
-    neighborhood.setIndividuals(neighborhood.getIndividuals.slice(0, popSize))
+    temp = temp.sortWith((a, b) => a.asInstanceOf[EpIndividual].wins > b.asInstanceOf[EpIndividual].wins)
+    neighborhood.setIndividuals(temp)
     MyLogger.logInfo(neighborhood.findBestIndividual().fitnessValue)
     //    PSOFactory.applyNormalCA(Config.iter, neighborhood, fitness)
   }
@@ -55,6 +57,7 @@ object EvolutionaryProgramming {
 
   def calculateNewPopulation(iteration: Int, neighborhood: Neighborhood, fitness: (Array[Double]) => Double): Unit = {
     val popSize = neighborhood.getIndividuals.length
+    neighborhood.setTempIndividuals(neighborhood.individuals_)
     //neighborhood.cAModule.update2(neighborhood, fitness) //new Array[EpIndividual](popSize)
     Config.epGenerateStrategy(iteration, neighborhood, false, fitness)
     //    for (i <- 0 until popSize) {

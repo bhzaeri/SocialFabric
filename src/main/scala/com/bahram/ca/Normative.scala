@@ -2,6 +2,7 @@ package com.bahram.ca
 
 import com.bahram.socialfabric.Individual
 import main.scala.com.bahram.ca.TribalRunner
+import main.scala.com.bahram.util.UtilMethods
 
 
 /**
@@ -44,6 +45,7 @@ class Normative() extends KnowledgeSource {
       val child = population(i).copy()
       val parent = population(i)
       Config.normativeUpdate(child, best, parent, this, sum)
+      UtilMethods.adjustBoundaries(child)
       child.fitnessValue = fitness(child.vector)
       TribalRunner.checkCount()
       child.ksType = KSEnum.NORMATIVE

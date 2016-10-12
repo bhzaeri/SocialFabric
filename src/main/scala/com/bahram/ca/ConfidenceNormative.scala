@@ -3,6 +3,7 @@ package main.scala.com.bahram.ca
 import com.bahram.ca.{Config, KSEnum, KnowledgeSource}
 import com.bahram.socialfabric.Individual
 import com.bahram.util.RandomUtil
+import main.scala.com.bahram.util.UtilMethods
 import org.apache.commons.math3.distribution.TDistribution
 
 import scala.Double.MaxValue
@@ -57,12 +58,12 @@ class ConfidenceNormative extends KnowledgeSource {
     val tDist: TDistribution = new TDistribution(counter) //stats.getN - 1)
     // Calculate critical value
     val alphA: Double = 1.0 - (1 - level) / 2
-    val critVal: Double = tDist.inverseCumulativeProbability(alphA)
+    val critVal: Double = 1.96 //tDist.inverseCumulativeProbability(alphA)
 
     var index = 0
     val offSprings = Array.fill[Individual](Config.populationSize)(null)
-    population.slice(0, s).foreach(i => {
-      val child = i.copy
+    population.foreach(i => {
+      val child = i.copy()
       val parent = i
       val alpha = RandomUtil.nextDouble()
       for (dim <- 0 until Config.dimension) {
@@ -76,6 +77,7 @@ class ConfidenceNormative extends KnowledgeSource {
         else
           child.vector(dim) = lb + alpha * (ub - lb)
       }
+      UtilMethods.adjustBoundaries(child)
       child.fitnessValue = fitness(child.vector)
       TribalRunner.checkCount()
       child.ksType = KSEnum.NORMATIVE

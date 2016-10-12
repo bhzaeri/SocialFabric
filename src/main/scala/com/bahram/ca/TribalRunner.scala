@@ -71,7 +71,7 @@ object TribalRunner {
   }
 
   def configure(funcIndex: Int) = {
-    Configure.sfpso(funcIndex)
+    Configure.sfep(funcIndex)
   }
 
   def logBestSoFar(): Unit = {

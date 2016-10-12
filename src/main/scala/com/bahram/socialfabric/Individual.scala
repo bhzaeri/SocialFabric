@@ -28,6 +28,7 @@ abstract class Individual(size: Int) {
       otherNeighbors.remove(rand)
       temp
     }
+    var ggg=0
   }
 
   def vector: Array[Double] = {
