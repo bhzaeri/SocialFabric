@@ -20,13 +20,20 @@ object MyLogger {
 
   def logInfo(value: Double): Unit = {
     if (flag) {
-      Config.filePrinter.write(value.toString + " ")
+      //      Config.filePrinter.write(value.toString + " ")
+      Config.logString.append(value.toString + " ")
       Config.printCount += 1
       flag = false
     }
   }
 
+  def logInfo(value: String): Unit = {
+    Config.logString.append("\n")
+  }
+
   def close(): Unit = {
+    Config.filePrinter.write(Config.logString.toString())
+    Config.filePrinter.flush()
     Config.filePrinter.close()
   }
 }

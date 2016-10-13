@@ -36,6 +36,7 @@ package object ca {
     var iter = 0
     var secondPhase = false
     var thirdPhase = false
+    var logString = new StringBuilder
 
     var filePrinter: PrintWriter = _
     var fitness: (Array[Double] => Double) = _

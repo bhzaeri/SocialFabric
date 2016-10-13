@@ -14,16 +14,16 @@ import main.scala.com.bahram.socialfabric.TieBreakingRules
   */
 object Configure {
 
-  def sfep(funcIndex: Int) = {
+  def sfep(funcIndex: Int, path: String) = {
     if (Config.filePrinter == null)
-      Config.filePrinter = new PrintWriter("src/main/resources/results/sfep_30_3.txt")
+      Config.filePrinter = new PrintWriter(path + "/sfep3/sfep3_" + funcIndex + "_" + Config.dimension + ".txt")
     Config.makePopulation = EpRunner.make
     Config.extra = EpRunner.extra
     Config.calculateNewPopulation = EvolutionaryProgramming.calculateNewPopulation
     Config.applyNewPosition = EvolutionaryProgramming.applyNewPositions
     Config.epGenerateStrategy = PSOFactory.applySocialFabric
     Config.neighborhoodRestructuring = TribalRunner.neighborhoodRestructuring1
-//    Config.resetNeighborhood = TribalRunner.resetNeighborhood
+    //    Config.resetNeighborhood = TribalRunner.resetNeighborhood
     Config.wSize = 1
     Config.applyCA = null
 
@@ -44,9 +44,9 @@ object Configure {
     TribalRunner.bestSoFar = null
   }
 
-  def sfhep(funcIndex: Int) = {
+  def sfhep(funcIndex: Int, path: String) = {
     if (Config.filePrinter == null)
-      Config.filePrinter = new PrintWriter("src/main/resources/results/sfhep.txt")
+      Config.filePrinter = new PrintWriter(path + "/sfhep/sfhep_" + funcIndex + "_" + Config.dimension + ".txt")
     Config.makePopulation = EpRunner.make
     Config.extra = EpRunner.extra
     Config.calculateNewPopulation = EvolutionaryProgramming.calculateNewPopulation
@@ -74,9 +74,11 @@ object Configure {
     TribalRunner.bestSoFar = null
   }
 
-  def sfpso(funcIndex: Int) = {
-    if (Config.filePrinter == null)
-      Config.filePrinter = new PrintWriter("src/main/resources/results/sfpso_30_2.txt")
+  def sfpso(funcIndex: Int, path: String) = {
+    if (Config.filePrinter == null) {
+      Config.filePrinter = new PrintWriter(path + "/sfpso2/sfpso2_" + funcIndex + "_" + Config.dimension + ".txt")
+      Config.logString = new StringBuilder
+    }
     Config.makePopulation = PsoRunner.make
     Config.extra = PsoRunner.extra
     Config.calculateNewPopulation = PSOAlgorithm.calculateNewPopulation
@@ -105,9 +107,11 @@ object Configure {
     TribalRunner.bestSoFar = null
   }
 
-  def tpso(funcIndex: Int) = {
-    if (Config.filePrinter == null)
-      Config.filePrinter = new PrintWriter("src/main/resources/results/tpso.txt")
+  def tpso(funcIndex: Int, path: String) = {
+    if (Config.filePrinter == null) {
+      Config.filePrinter = new PrintWriter(path + "/tpso/tpso_" + funcIndex + "_" + Config.dimension + ".txt")
+      Config.logString = new StringBuilder
+    }
     Config.makePopulation = PsoRunner.make
     Config.extra = PsoRunner.extra
     Config.calculateNewPopulation = PSOAlgorithm.calculateNewPopulation
@@ -131,9 +135,9 @@ object Configure {
     TribalRunner.bestSoFar = null
   }
 
-  def caep(funcIndex: Int) = {
+  def caep(funcIndex: Int, path: String) = {
     if (Config.filePrinter == null)
-      Config.filePrinter = new PrintWriter("src/main/resources/results/caep.txt")
+      Config.filePrinter = new PrintWriter(path + "/caep/caep_" + funcIndex + "_" + Config.dimension + ".txt")
     Config.makePopulation = EpRunner.make
     Config.extra = EpRunner.extra
     Config.calculateNewPopulation = EvolutionaryProgramming.calculateNewPopulation

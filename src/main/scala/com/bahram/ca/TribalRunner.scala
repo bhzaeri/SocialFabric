@@ -19,15 +19,25 @@ object TribalRunner {
   var bestSoFar: Individual = _
 
   def main(args: Array[String]): Unit = {
+
+    val path = args(0)
     for (i <- 1 to 15) {
-      run(i)
-      Config.filePrinter.write("\n")
+      run(i, path)
+    }
+  }
+
+  def run(funcIndex: Int, path: String): Unit = {
+    Config.filePrinter = null
+    for (seed <- 1 to 20) {
+      run(funcIndex, seed, path)
+      MyLogger.logInfo("\n")
     }
     MyLogger.close()
   }
 
-  def run(funcIndex: Int): Unit = {
-    configure(funcIndex)
+  def run(funcIndex: Int, seed: Int, path: String): Unit = {
+    RandomUtil.init(100 + seed)
+    configure(funcIndex, path)
     tribes = Array.fill[Neighborhood](Config.tribeNumber) {
       new Neighborhood(PSOFactory.population(Config.makePopulation(Config.populationSize), Config.extra, Config.fitness),
         TopologyFactory.create(Config.topologyType, Config.populationSize), new CAModule)
@@ -63,15 +73,12 @@ object TribalRunner {
         tribes = Array.fill[Neighborhood](1) {
           unify()
         }
-        logger.info("unifiedDDDDDDDDDDDDDDDDDDDD")
+        //        logger.info("unifiedDDDDDDDDDDDDDDDDDDDD")
       }
 
-      logger.info(Config.iter + "   " + Config.countFEs)
+      //      logger.info(Config.iter + "   " + Config.countFEs)
     }
-  }
-
-  def configure(funcIndex: Int) = {
-    Configure.sfep(funcIndex)
+    logger.info("function T" + funcIndex + " :: iteration=" + seed)
   }
 
   def logBestSoFar(): Unit = {
@@ -84,19 +91,6 @@ object TribalRunner {
     MyLogger.logInfo(bestSoFar.fitnessValue)
   }
 
-  def findIntraTribalBest(): Individual = {
-    var minValue = Double.MaxValue
-    var best: Individual = null
-    tribes.foreach(tribe => {
-      val temp = tribe.best
-      if (temp.fitnessValue < minValue) {
-        minValue = temp.fitnessValue
-        best = temp
-      }
-    })
-    best
-  }
-
   def unify(): Neighborhood = {
     var all = new ArrayBuffer[Individual]()
     Config.populationSize *= Config.tribeNumber
@@ -107,6 +101,10 @@ object TribalRunner {
     Config.resetNeighborhood(all)
 
     new Neighborhood(all.toArray, TopologyFactory.create(0, all.size), new CAModule)
+  }
+
+  def configure(funcIndex: Int, path: String) = {
+    Configure.sfpso(funcIndex, path)
   }
 
   def resetNeighborhood(all: ArrayBuffer[Individual]): Unit = {
@@ -192,6 +190,19 @@ object TribalRunner {
         tribe.topologyIndex = tempIndex
       tribe.nsk = 0
     }
+  }
+
+  def findIntraTribalBest(): Individual = {
+    var minValue = Double.MaxValue
+    var best: Individual = null
+    tribes.foreach(tribe => {
+      val temp = tribe.best
+      if (temp.fitnessValue < minValue) {
+        minValue = temp.fitnessValue
+        best = temp
+      }
+    })
+    best
   }
 
   def checkCount() = {
