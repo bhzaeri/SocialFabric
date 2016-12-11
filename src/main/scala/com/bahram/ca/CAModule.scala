@@ -10,8 +10,16 @@ import scala.util.control.Breaks
 /**
   * Created by zaeri on 03/08/16.
   */
-class CAModule {
-  val knowledgeSources: Map[KSEnum.Value, KnowledgeSource] = Map(KSEnum.SITUATIONAL -> new Situational, KSEnum.NORMATIVE -> new Normative, KSEnum.TOPOGRAPHIC -> new Topographic)
+class CAModule(normativeType: Int) {
+  val knowledgeSources: Map[KSEnum.Value, KnowledgeSource] = Map(KSEnum.SITUATIONAL -> new Situational, KSEnum.NORMATIVE -> normativeFactory(), KSEnum.TOPOGRAPHIC -> new Topographic)
+
+  def normativeFactory(): KnowledgeSource = {
+    normativeType match {
+      case 0 => new Normative
+      case 1 => new ConfidenceNormative
+      case any => null
+    }
+  }
 
   def update(neighborhood: Neighborhood, mergeOutput: Boolean, fitness: (Array[Double] => Double)): Array[Individual] = {
     val population = neighborhood.getIndividuals

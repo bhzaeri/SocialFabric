@@ -20,27 +20,39 @@ object TribalRunner {
 
   def main(args: Array[String]): Unit = {
 
-    val path = args(0)
-    for (i <- 1 to 15) {
-      run(i, path)
+//        val path = "/home/zaeri/ThesisResults"
+//        val algorithm = "sfep"
+//        val normativeType = 0
+//        Config.dimension = 10
+//
+//
+    val path = args(0) //"/home/zaeri/ThesisResults"
+    val algorithm = args(1) //"hpso"
+    val normativeType = args(2).toInt //-1
+    Config.dimension = args(3).toInt
+    Config.normativeType = normativeType
+    println(path + " :: " + algorithm + " :: " + normativeType)
+
+    for (funcIndex <- 1 to 15) {
+      run(funcIndex, path, algorithm, normativeType)
     }
   }
 
-  def run(funcIndex: Int, path: String): Unit = {
+  def run(funcIndex: Int, path: String, algorithm: String, normativeType: Int): Unit = {
     Config.filePrinter = null
-    for (seed <- 1 to 20) {
-      run(funcIndex, seed, path)
+    for (seed <- 1 to 1) {
+      run(funcIndex, seed, path, algorithm, normativeType)
       MyLogger.logInfo("\n")
     }
     MyLogger.close()
   }
 
-  def run(funcIndex: Int, seed: Int, path: String): Unit = {
+  def run(funcIndex: Int, seed: Int, path: String, algorithm: String, normativeType: Int): Unit = {
     RandomUtil.init(100 + seed)
-    configure(funcIndex, path)
+    configure(funcIndex, path, algorithm)
     tribes = Array.fill[Neighborhood](Config.tribeNumber) {
       new Neighborhood(PSOFactory.population(Config.makePopulation(Config.populationSize), Config.extra, Config.fitness),
-        TopologyFactory.create(Config.topologyType, Config.populationSize), new CAModule)
+        TopologyFactory.create(Config.topologyType, Config.populationSize), new CAModule(normativeType))
     }
 
     while (Config.countFEs <= Config.maxFEs) {
@@ -71,7 +83,7 @@ object TribalRunner {
 
       if (Config.thirdPhase && tribes.length > 1) {
         tribes = Array.fill[Neighborhood](1) {
-          unify()
+          unify(normativeType)
         }
         //        logger.info("unifiedDDDDDDDDDDDDDDDDDDDD")
       }
@@ -91,7 +103,7 @@ object TribalRunner {
     MyLogger.logInfo(bestSoFar.fitnessValue)
   }
 
-  def unify(): Neighborhood = {
+  def unify(normativeType: Int): Neighborhood = {
     var all = new ArrayBuffer[Individual]()
     Config.populationSize *= Config.tribeNumber
     tribes.foreach(tribe => {
@@ -100,11 +112,11 @@ object TribalRunner {
 
     Config.resetNeighborhood(all)
 
-    new Neighborhood(all.toArray, TopologyFactory.create(0, all.size), new CAModule)
+    new Neighborhood(all.toArray, TopologyFactory.create(0, all.size), new CAModule(normativeType))
   }
 
-  def configure(funcIndex: Int, path: String) = {
-    Configure.sfpso(funcIndex, path)
+  def configure(funcIndex: Int, path: String, algorithm: String) = {
+    Configure.factory(algorithm)(funcIndex, path)
   }
 
   def resetNeighborhood(all: ArrayBuffer[Individual]): Unit = {

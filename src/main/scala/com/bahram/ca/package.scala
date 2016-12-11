@@ -19,7 +19,7 @@ package object ca {
     val lowerBound = -100
     val upperBound = 100
     val maxTopoDepth = 50
-    val dimension = 10
+    var dimension = 10
     var mThresh = 3
     var wSize = 5
     var topologyType = 3
@@ -28,7 +28,7 @@ package object ca {
     var populationSize = 9
     var tribeNumber = 10
     var phaseIndex = 0
-
+    var normativeType = -1
     var normativeUpdate: (Individual, Individual, Individual, Normative, Double) => Unit = _
     var topographicUpdate: (Individual, Individual, Individual, Cell) => Unit = _
     var psoStrategy: ((Particle, Array[Double]) => Unit) = _

@@ -11,9 +11,6 @@ object PhaseChange {
   val phases = Array(0.2, 0.5)
 
   def checkChange() = {
-    if (Config.countFEs > 30000) {
-      var ggg = 0
-    }
     if (Config.phaseIndex < phases.length && Config.countFEs == (phases(Config.phaseIndex) * Config.maxFEs).asInstanceOf[Int]) {
       Config.secondPhase = !Config.secondPhase
       if (Config.secondPhase) {
